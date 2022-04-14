@@ -30,7 +30,7 @@ void setup() {
 
   //initialize the variables we're linked to
   Input = temp;
-  Setpoint = 50;
+  Setpoint = 25;
 
   //turn the PID on
   myPID.SetMode(AUTOMATIC);
@@ -43,9 +43,8 @@ void loop() {
   TEMPREAD();
   PIDC();
   SETVALVE();
-  delay(500);
-  Serial.print("setpos ");
-  Serial.println(setpos);
+  delay(1000);
+
   
 }
 
@@ -76,6 +75,7 @@ void loop() {
     delay(100);
     servo.detach();
     valvepos = valvepos +1;
+    
     Serial.print("valvepos: ");
     Serial.println(valvepos);
   }
@@ -87,22 +87,28 @@ void loop() {
     delay(100);
     servo.detach();
     valvepos = valvepos -1;
+    
     Serial.print("valvepos: ");
     Serial.println(valvepos);
   }
 
 void TEMPREAD(){
 temp = thermistor.read();   // Read temperature
+delay(100);
+  Serial.print ("Measured temp: ");
   Serial.println (temp);
+  Serial.print ("Set temp: ");
+  Serial.println (Setpoint);
 }
 
 
 void PIDC(){
     Input = temp;
     myPID.Compute();
-   Serial.print("PIDOUT: ");
-   Serial.println(Output);
    setpos = map(Output, 0, 255, 33, 0);
+   
+   Serial.print("setpos: ");
+   Serial.println(setpos);
 }
 
 void SETVALVE(){

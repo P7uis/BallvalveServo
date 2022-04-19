@@ -17,17 +17,16 @@ PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
 
 // Thermistor object
 THERMISTOR thermistor(NTC_PIN,        // Analog pin
-                      104000,          // Nominal resistance at 25 ºC
+                      100000,          // Nominal resistance at 25 ºC
                       3950,           // thermistor's beta coefficient
-                      98000);         // Value of the series resistor
+                      100000);         // Value of the series resistor
 
 // Global temperature reading
-uint16_t temp;
+int temp;
 
 void setup() {
-  Serial.begin(9600);
-  Serial.print(valvepos);
-
+  //Serial.begin(9600);
+  
   //initialize the variables we're linked to
   Input = temp;
   Setpoint = 25;
@@ -35,17 +34,17 @@ void setup() {
   //turn the PID on
   myPID.SetMode(AUTOMATIC);
   
-  //HOME(); 
+  HOME(); 
 }
 
 void loop() {
   //Serial.print(counter);
   TEMPREAD();
+  delay(100);
   PIDC();
+  delay(100);
   SETVALVE();
   delay(1000);
-
-  
 }
 
   void HOME(){
@@ -55,13 +54,13 @@ void loop() {
   }
   
   void OPEN(){
-    for (valvepos = 1; valvepos <= 33;){
+    for (valvepos = 1; valvepos < 20;){
       open1();
       delay(200);
     }
   }
   void CLOSE(){
-    for (valvepos = 33; valvepos >= 1;){
+    for (valvepos = 20; valvepos > 0;){
       close1();
       delay(200);
     }
@@ -75,9 +74,6 @@ void loop() {
     delay(100);
     servo.detach();
     valvepos = valvepos +1;
-    
-    Serial.print("valvepos: ");
-    Serial.println(valvepos);
   }
 
   void close1(){
@@ -87,28 +83,18 @@ void loop() {
     delay(100);
     servo.detach();
     valvepos = valvepos -1;
-    
-    Serial.print("valvepos: ");
-    Serial.println(valvepos);
   }
 
 void TEMPREAD(){
 temp = thermistor.read();   // Read temperature
-delay(100);
-  Serial.print ("Measured temp: ");
-  Serial.println (temp);
-  Serial.print ("Set temp: ");
-  Serial.println (Setpoint);
+delay(500);
 }
 
 
 void PIDC(){
     Input = temp;
     myPID.Compute();
-   setpos = map(Output, 0, 255, 33, 0);
-   
-   Serial.print("setpos: ");
-   Serial.println(setpos);
+   setpos = map(Output, 0, 255, 20 , 0);
 }
 
 void SETVALVE(){
